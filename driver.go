@@ -2,33 +2,26 @@ package ponzu_driver_postgres
 
 import (
 	"context"
-	"fmt"
-	"github.com/fanky5g/ponzu-driver-postgres/models"
-	"github.com/fanky5g/ponzu-driver-postgres/repositories"
-	ponzuContent "github.com/fanky5g/ponzu/content"
+	"github.com/fanky5g/ponzu-driver-postgres/database"
+	"github.com/fanky5g/ponzu-driver-postgres/repository"
 	ponzuDriver "github.com/fanky5g/ponzu/driver"
-	"github.com/fanky5g/ponzu/tokens"
+	"github.com/fanky5g/ponzu/models"
 	"github.com/jackc/pgx/v5/pgxpool"
 	log "github.com/sirupsen/logrus"
-	"sync"
-)
-
-var (
-	once sync.Once
-	conn *pgxpool.Pool
 )
 
 type driver struct {
-	conn *pgxpool.Pool
+	conn         *pgxpool.Pool
+	repositories map[string]ponzuDriver.Repository
 }
 
-func (database *driver) Get(token tokens.Repository) interface{} {
-	repository, err := repositories.New()
-	if err != nil {
-		log.Panicf("Failed to get repository %v: %v", token, err)
+func (database *driver) Get(token string) interface{} {
+	if repo, ok := database.repositories[token]; ok {
+		return repo
 	}
 
-	return repository
+	log.Panicf("Repository %s not found", token)
+	return nil
 }
 
 func (database *driver) Close() error {
@@ -36,46 +29,26 @@ func (database *driver) Close() error {
 	return nil
 }
 
-func New(
-	contentTypes map[string]ponzuContent.Builder,
-	contentModels map[string]*models.Model,
-) (ponzuDriver.Database, error) {
-	var err error
-	once.Do(func() {
-		var cfg *Config
-		cfg, err = getConfig()
-		if err != nil {
-			err = fmt.Errorf("failed to get config: %v", err)
-			return
-		}
-
-		dsn := fmt.Sprintf(
-			"postgres://%s:%s@%s:%d/%s",
-			cfg.User,
-			cfg.Password,
-			cfg.Host,
-			cfg.Port,
-			cfg.Name,
-		)
-
-		conn, err = pgxpool.New(context.Background(), dsn)
-		if err != nil {
-			err = fmt.Errorf("failed to connect to database: %v", err)
-			return
-		}
-	})
+func New(models []models.ModelInterface) (ponzuDriver.Database, error) {
+	ctx := context.Background()
+	conn, err := database.GetConnection(ctx)
 
 	if err != nil {
 		return nil, err
 	}
 
-	for _, model := range contentModels {
-		models.RegisterModel(model)
+	repos := make(map[string]ponzuDriver.Repository)
+	for _, model := range models {
+		var repo ponzuDriver.Repository
+		repo, err = repository.New(conn, model)
+		if err != nil {
+			return nil, err
+		}
+
+		repos[model.Name()] = repo
 	}
 
-	if err = CreateTables(conn); err != nil {
-		return nil, fmt.Errorf("failed to create tables: %v", err)
-	}
+	d := &driver{conn: conn, repositories: repos}
 
-	return &driver{conn: conn}, nil
+	return d, nil
 }

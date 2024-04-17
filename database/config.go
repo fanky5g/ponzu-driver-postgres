@@ -1,4 +1,4 @@
-package ponzu_driver_postgres
+package database
 
 import (
 	"errors"
@@ -40,6 +40,9 @@ func getConfig() (*Config, error) {
 	viper.SetConfigName("ponzu") // ponzu config file
 	viper.SetConfigType("props")
 	viper.AddConfigPath(cwd)
+
+	viper.AutomaticEnv()
+
 	err = viper.ReadInConfig()
 	if err != nil && errors.As(err, &viper.ConfigFileNotFoundError{}) {
 		log.Info("config file not found. will default to provided flags")
