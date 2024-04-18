@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS %s (
 		return err
 	}
 
+	defer conn.Release()
 	_, err = conn.Exec(ctx, sqlString)
 	return err
 }
