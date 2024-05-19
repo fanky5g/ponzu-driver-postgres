@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
-	"github.com/fanky5g/ponzu-driver-postgres/database"
+	"github.com/fanky5g/ponzu-driver-postgres/connection"
 	ponzuDriver "github.com/fanky5g/ponzu/driver"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +18,7 @@ type InsertTestSuite struct {
 }
 
 func (s *InsertTestSuite) SetupSuite() {
-	conn, err := database.GetConnection(context.Background())
+	conn, err := connection.Get(context.Background())
 	if err != nil {
 		s.T().Fatal(err)
 	}

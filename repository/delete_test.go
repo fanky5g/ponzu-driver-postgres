@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
-	"github.com/fanky5g/ponzu-driver-postgres/database"
+	"github.com/fanky5g/ponzu-driver-postgres/connection"
 	ponzuConstants "github.com/fanky5g/ponzu/constants"
 	ponzuDriver "github.com/fanky5g/ponzu/driver"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -19,7 +19,7 @@ type DeleteTestSuite struct {
 }
 
 func (s *DeleteTestSuite) SetupSuite() {
-	conn, err := database.GetConnection(context.Background())
+	conn, err := connection.Get(context.Background())
 	if err != nil {
 		s.T().Fatal(err)
 	}

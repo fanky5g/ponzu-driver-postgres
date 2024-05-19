@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
-	"github.com/fanky5g/ponzu-driver-postgres/database"
+	"github.com/fanky5g/ponzu-driver-postgres/connection"
 	ponzuConstants "github.com/fanky5g/ponzu/constants"
 	ponzuDriver "github.com/fanky5g/ponzu/driver"
 	"github.com/fanky5g/ponzu/entities"
@@ -40,7 +40,7 @@ type FindTestSuite struct {
 
 func (s *FindTestSuite) SetupSuite() {
 	defaultQuerySize = 3 // set to 3 to allow batching in FindAll
-	conn, err := database.GetConnection(context.Background())
+	conn, err := connection.Get(context.Background())
 	if err != nil {
 		s.T().Fatal(err)
 	}

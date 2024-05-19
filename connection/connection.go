@@ -1,4 +1,4 @@
-package database
+package connection
 
 import (
 	"context"
@@ -12,7 +12,7 @@ var (
 	conn *pgxpool.Pool
 )
 
-func GetConnection(ctx context.Context) (*pgxpool.Pool, error) {
+func Get(ctx context.Context) (*pgxpool.Pool, error) {
 	var err error
 	once.Do(func() {
 		var cfg *Config
@@ -31,7 +31,7 @@ func GetConnection(ctx context.Context) (*pgxpool.Pool, error) {
 			cfg.Name,
 		)
 
-		conn, err = pgxpool.New(context.Background(), dsn)
+		conn, err = pgxpool.New(ctx, dsn)
 		if err != nil {
 			err = fmt.Errorf("failed to connect to database: %v", err)
 			return
