@@ -12,7 +12,12 @@ type repository struct {
 	model models.ModelInterface
 }
 
-func New(conn *pgxpool.Pool, model models.ModelInterface) (driver.Repository, error) {
+type Repository interface {
+	driver.Repository
+	RowScanner
+}
+
+func New(conn *pgxpool.Pool, model models.ModelInterface) (Repository, error) {
 	repo := &repository{
 		conn:  conn,
 		model: model,

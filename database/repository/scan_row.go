@@ -13,7 +13,11 @@ type Row interface {
 	Scan(dest ...any) error
 }
 
-func (repo *repository) scanRow(row Row) (interface{}, error) {
+type RowScanner interface {
+	ScanRow(row Row) (interface{}, error)
+}
+
+func (repo *repository) ScanRow(row Row) (interface{}, error) {
 	var idBytes []byte
 	var createdAt, updatedAt pgtype.Timestamptz
 

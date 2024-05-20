@@ -1,21 +1,16 @@
-package ponzu_driver_postgres
+package database
 
 import (
 	"context"
 	"fmt"
 	"github.com/fanky5g/ponzu-driver-postgres/connection"
-	"github.com/fanky5g/ponzu-driver-postgres/repository"
+	"github.com/fanky5g/ponzu-driver-postgres/database/repository"
 	ponzuDriver "github.com/fanky5g/ponzu/driver"
 	"github.com/fanky5g/ponzu/entities"
 	"github.com/fanky5g/ponzu/models"
 	"github.com/fanky5g/ponzu/tokens"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
-
-type PostgresDriver interface {
-	ponzuDriver.Database
-	ponzuDriver.SearchInterface
-}
 
 type driver struct {
 	conn         *pgxpool.Pool
@@ -35,7 +30,7 @@ func (database *driver) Close() error {
 	return nil
 }
 
-func New(models []models.ModelInterface) (PostgresDriver, error) {
+func New(models []models.ModelInterface) (ponzuDriver.Database, error) {
 	ctx := context.Background()
 	conn, err := connection.Get(ctx)
 

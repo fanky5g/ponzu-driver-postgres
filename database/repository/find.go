@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-var defaultQuerySize = 100
+var DefaultQuerySize = 100
 
 func (repo *repository) FindOneById(id string) (interface{}, error) {
 	ctx := context.Background()
@@ -39,7 +39,7 @@ func (repo *repository) Latest() (interface{}, error) {
 
 	defer conn.Release()
 
-	return repo.scanRow(conn.QueryRow(
+	return repo.ScanRow(conn.QueryRow(
 		context.Background(),
 		sqlString,
 	))
@@ -81,7 +81,7 @@ func (repo *repository) FindOneBy(criteria map[string]interface{}) (interface{},
 	}
 
 	defer conn.Release()
-	return repo.scanRow(conn.QueryRow(
+	return repo.ScanRow(conn.QueryRow(
 		context.Background(),
 		sqlString,
 		values...,
@@ -127,7 +127,7 @@ func (repo *repository) Find(order ponzuConstants.SortOrder, pagination *entitie
 		sortOrder = "ASC"
 	}
 
-	limit := defaultQuerySize
+	limit := DefaultQuerySize
 	if pagination != nil && pagination.Count > 0 {
 		limit = pagination.Count
 	}
@@ -156,7 +156,7 @@ func (repo *repository) Find(order ponzuConstants.SortOrder, pagination *entitie
 	results := make([]interface{}, 0)
 	for rows.Next() {
 		var result interface{}
-		if result, err = repo.scanRow(rows); err != nil {
+		if result, err = repo.ScanRow(rows); err != nil {
 			return 0, nil, err
 		}
 
@@ -203,7 +203,7 @@ func (repo *repository) findOneByIdWithConn(id string, conn *pgxpool.Conn) (inte
 		repo.model.Name(),
 	)
 
-	return repo.scanRow(conn.QueryRow(
+	return repo.ScanRow(conn.QueryRow(
 		context.Background(),
 		sqlString,
 		id,

@@ -39,7 +39,7 @@ type FindTestSuite struct {
 }
 
 func (s *FindTestSuite) SetupSuite() {
-	defaultQuerySize = 3 // set to 3 to allow batching in FindAll
+	DefaultQuerySize = 3 // set to 3 to allow batching in FindAll
 	conn, err := connection.Get(context.Background())
 	if err != nil {
 		s.T().Fatal(err)

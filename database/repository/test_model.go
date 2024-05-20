@@ -19,6 +19,10 @@ type testEntity struct {
 	Age     int       `json:"age"`
 }
 
+func (entity *testEntity) EntityName() string {
+	return "testEntity"
+}
+
 func (entity *testEntity) ItemID() string {
 	return entity.ID
 }
