@@ -19,6 +19,8 @@ github.com/fanky5g/ponzu v0.0.0-20240520090400-ad326d8bb659 h1:9CRB1mTjiZbAG99mh
 github.com/fanky5g/ponzu v0.0.0-20240520090400-ad326d8bb659/go.mod h1:MI2Ww8Ji9dBJ5AG9dDh7uqauWMWpD4ERONOcijoka8g=
 github.com/fanky5g/ponzu v0.0.0-20240520090810-b62d2142906d h1:nkQgneLAuQpsCaQrelOL561crQz1tZFeGk1xaxMuaX8=
 github.com/fanky5g/ponzu v0.0.0-20240520090810-b62d2142906d/go.mod h1:MI2Ww8Ji9dBJ5AG9dDh7uqauWMWpD4ERONOcijoka8g=
+github.com/fanky5g/ponzu v0.0.0-20240520092742-0a60fdd5393a h1:cJ247uzPWxuxVAgswOVbNsPyotHV9qguqgxUds04I6E=
+github.com/fanky5g/ponzu v0.0.0-20240520092742-0a60fdd5393a/go.mod h1:MI2Ww8Ji9dBJ5AG9dDh7uqauWMWpD4ERONOcijoka8g=
 github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHkI4W8=
 github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
 github.com/fsnotify/fsnotify v1.7.0 h1:8JEhPFa5W2WU7YfeZzPNqzMP6Lwt7L2715Ggo0nosvA=

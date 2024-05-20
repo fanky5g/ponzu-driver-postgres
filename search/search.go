@@ -126,7 +126,7 @@ func (s *searchClient) Delete(id string) error {
 	return nil
 }
 
-func NewEntitySearch(model models.ModelInterface) (ponzuDriver.SearchIndexInterface, error) {
+func NewEntitySearch(model models.ModelInterface) (ponzuDriver.SearchInterface, error) {
 	conn, err := connection.Get(context.Background())
 	if err != nil {
 		return nil, err

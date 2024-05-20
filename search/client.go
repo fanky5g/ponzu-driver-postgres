@@ -9,7 +9,7 @@ import (
 )
 
 type client struct {
-	searchClients map[string]ponzuDriver.SearchIndexInterface
+	searchClients map[string]ponzuDriver.SearchInterface
 }
 
 // CreateIndex is a no-op as in postgres we don't have to create any indexes
@@ -17,7 +17,7 @@ func (c *client) CreateIndex(entityName string, entityType interface{}) error {
 	return nil
 }
 
-func (c *client) GetIndex(entityName string) (ponzuDriver.SearchIndexInterface, error) {
+func (c *client) GetIndex(entityName string) (ponzuDriver.SearchInterface, error) {
 	if sc, ok := c.searchClients[entityName]; ok {
 		return sc, nil
 	}
@@ -26,7 +26,7 @@ func (c *client) GetIndex(entityName string) (ponzuDriver.SearchIndexInterface, 
 }
 
 func New(models []models.ModelInterface) (ponzuDriver.SearchClientInterface, error) {
-	searchClients := make(map[string]ponzuDriver.SearchIndexInterface)
+	searchClients := make(map[string]ponzuDriver.SearchInterface)
 	for _, model := range models {
 		entity := model.NewEntity()
 		contentEntity, ok := entity.(content.Entity)

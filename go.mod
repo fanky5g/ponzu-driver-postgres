@@ -3,7 +3,7 @@ module github.com/fanky5g/ponzu-driver-postgres
 go 1.21.5
 
 require (
-	github.com/fanky5g/ponzu v0.0.0-20240520090810-b62d2142906d
+	github.com/fanky5g/ponzu v0.0.0-20240520092742-0a60fdd5393a
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgtype v1.14.3
 	github.com/jackc/pgx/v5 v5.5.5
