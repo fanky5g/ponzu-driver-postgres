@@ -3,7 +3,8 @@ package repository
 import (
 	"errors"
 	"fmt"
-	"github.com/fanky5g/ponzu/models"
+
+	"github.com/fanky5g/ponzu-driver-postgres/types"
 	"github.com/google/uuid"
 	"github.com/jackc/pgtype"
 	"github.com/jackc/pgx/v5"
@@ -17,11 +18,11 @@ type RowScanner interface {
 	ScanRow(row Row) (interface{}, error)
 }
 
-func (repo *repository) ScanRow(row Row) (interface{}, error) {
+func (repo *Repository) ScanRow(row Row) (interface{}, error) {
 	var idBytes []byte
 	var createdAt, updatedAt pgtype.Timestamptz
 
-	model := &models.Model{
+	model := &types.Model{
 		Document: repo.model.ToDocument(repo.model.NewEntity()),
 	}
 

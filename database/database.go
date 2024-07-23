@@ -2,35 +2,23 @@ package database
 
 import (
 	"context"
+	"errors"
 	"fmt"
+
 	"github.com/fanky5g/ponzu-driver-postgres/connection"
 	"github.com/fanky5g/ponzu-driver-postgres/database/repository"
-	ponzuDriver "github.com/fanky5g/ponzu/driver"
-	"github.com/fanky5g/ponzu/entities"
-	"github.com/fanky5g/ponzu/models"
-	"github.com/fanky5g/ponzu/tokens"
+	"github.com/fanky5g/ponzu-driver-postgres/types"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type driver struct {
+var ErrRepositoryNotFound = errors.New("repository not found")
+
+type Driver struct {
 	conn         *pgxpool.Pool
-	repositories map[tokens.RepositoryToken]ponzuDriver.Repository
+	repositories map[string]*repository.Repository
 }
 
-func (database *driver) GetRepositoryByToken(token tokens.RepositoryToken) ponzuDriver.Repository {
-	if repo, ok := database.repositories[token]; ok {
-		return repo
-	}
-
-	return nil
-}
-
-func (database *driver) Close() error {
-	database.conn.Close()
-	return nil
-}
-
-func New(models []models.ModelInterface) (ponzuDriver.Database, error) {
+func New(models ...types.ModelInterface) (*Driver, error) {
 	ctx := context.Background()
 	conn, err := connection.Get(ctx)
 
@@ -38,15 +26,15 @@ func New(models []models.ModelInterface) (ponzuDriver.Database, error) {
 		return nil, err
 	}
 
-	repos := make(map[tokens.RepositoryToken]ponzuDriver.Repository)
+	repos := make(map[string]*repository.Repository)
 	for _, model := range models {
 		entity := model.NewEntity()
-		persistable, ok := entity.(entities.Persistable)
+		persistable, ok := entity.(types.Persistable)
 		if !ok {
 			return nil, fmt.Errorf("entity %T is not persistable", entity)
 		}
 
-		var repo ponzuDriver.Repository
+		var repo *repository.Repository
 		repo, err = repository.New(conn, model)
 		if err != nil {
 			return nil, err
@@ -55,7 +43,7 @@ func New(models []models.ModelInterface) (ponzuDriver.Database, error) {
 		repos[persistable.GetRepositoryToken()] = repo
 	}
 
-	d := &driver{conn: conn, repositories: repos}
+	d := &Driver{conn: conn, repositories: repos}
 
 	return d, nil
 }

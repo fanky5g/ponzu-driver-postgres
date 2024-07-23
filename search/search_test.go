@@ -2,22 +2,23 @@ package search
 
 import (
 	"context"
+	"os"
+	"testing"
+
 	"github.com/fanky5g/ponzu-driver-postgres/connection"
 	"github.com/fanky5g/ponzu-driver-postgres/database/repository"
 	"github.com/fanky5g/ponzu-driver-postgres/test"
-	ponzuDriver "github.com/fanky5g/ponzu/driver"
+	"github.com/fanky5g/ponzu-driver-postgres/types"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"os"
-	"testing"
 )
 
 type SearchTestSuite struct {
 	suite.Suite
 
-	client ponzuDriver.SearchInterface
-	repo   ponzuDriver.Repository
+	client types.Search
+	repo   *repository.Repository
 	conn   *pgxpool.Pool
 }
 

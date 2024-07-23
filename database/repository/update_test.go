@@ -3,18 +3,18 @@ package repository
 import (
 	"context"
 	"fmt"
+	"testing"
+
 	"github.com/fanky5g/ponzu-driver-postgres/connection"
-	ponzuDriver "github.com/fanky5g/ponzu/driver"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"testing"
 )
 
 type UpdateTestSuite struct {
 	suite.Suite
-	repo   ponzuDriver.Repository
+	repo   *Repository
 	conn   *pgxpool.Pool
 	entity *testEntity
 }

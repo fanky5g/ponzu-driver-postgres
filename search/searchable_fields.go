@@ -2,9 +2,10 @@ package search
 
 import (
 	"fmt"
-	"github.com/fanky5g/ponzu/entities"
-	"github.com/fanky5g/ponzu/util"
 	"reflect"
+
+	"github.com/fanky5g/ponzu-driver-postgres/types"
+	"github.com/fanky5g/ponzu-driver-postgres/util"
 )
 
 // getSearchableFields returns fields that are supported for search
@@ -13,7 +14,7 @@ func getSearchableFields(entity interface{}) ([]string, error) {
 	t := v.Type()
 
 	var searchableFields []string
-	searchableAttributes, ok := entity.(entities.CustomizableSearchAttributes)
+	searchableAttributes, ok := entity.(types.CustomizableSearchAttributes)
 	if ok {
 		for attribute, attributeType := range searchableAttributes.GetSearchableAttributes() {
 			if attributeType.Kind() != reflect.String {

@@ -2,23 +2,17 @@ package repository
 
 import (
 	"context"
-	"github.com/fanky5g/ponzu/driver"
-	"github.com/fanky5g/ponzu/models"
 	"github.com/jackc/pgx/v5/pgxpool"
+    "github.com/fanky5g/ponzu-driver-postgres/types"
 )
 
-type repository struct {
+type Repository struct {
 	conn  *pgxpool.Pool
-	model models.ModelInterface
+	model types.ModelInterface
 }
 
-type Repository interface {
-	driver.Repository
-	RowScanner
-}
-
-func New(conn *pgxpool.Pool, model models.ModelInterface) (Repository, error) {
-	repo := &repository{
+func New(conn *pgxpool.Pool, model types.ModelInterface) (*Repository, error) {
+	repo := &Repository{
 		conn:  conn,
 		model: model,
 	}

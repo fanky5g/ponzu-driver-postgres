@@ -3,12 +3,12 @@ package search
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/fanky5g/ponzu-driver-postgres/connection"
 	"github.com/fanky5g/ponzu-driver-postgres/database/repository"
-	ponzuDriver "github.com/fanky5g/ponzu/driver"
-	"github.com/fanky5g/ponzu/models"
+	"github.com/fanky5g/ponzu-driver-postgres/types"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"strings"
 )
 
 type searchClient struct {
@@ -120,13 +120,12 @@ func (s *searchClient) Update(id string, data interface{}) error {
 }
 
 // Delete is a no-op as with postgres we don't have to delete from an index.
-//
 //	Deletion from database from repository should be sufficient
 func (s *searchClient) Delete(id string) error {
 	return nil
 }
 
-func NewEntitySearch(model models.ModelInterface) (ponzuDriver.SearchInterface, error) {
+func NewEntitySearch(model types.ModelInterface) (types.Search, error) {
 	conn, err := connection.Get(context.Background())
 	if err != nil {
 		return nil, err
@@ -135,7 +134,7 @@ func NewEntitySearch(model models.ModelInterface) (ponzuDriver.SearchInterface, 
 	return NewEntitySearchWithConn(conn, model)
 }
 
-func NewEntitySearchWithConn(conn *pgxpool.Pool, model models.ModelInterface) (ponzuDriver.SearchInterface, error) {
+func NewEntitySearchWithConn(conn *pgxpool.Pool, model types.ModelInterface) (types.Search, error) {
 	repo, err := repository.New(conn, model)
 	if err != nil {
 		return nil, err

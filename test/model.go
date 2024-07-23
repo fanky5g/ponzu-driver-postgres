@@ -3,10 +3,10 @@ package test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/fanky5g/ponzu/models"
-	"github.com/fanky5g/ponzu/tokens"
 	"strings"
 	"time"
+
+	"github.com/fanky5g/ponzu-driver-postgres/types"
 )
 
 var ModelToken = "test"
@@ -60,7 +60,7 @@ func (entity *Entity) SetUpdatedAt(t time.Time) {
 	entity.Updated = t
 }
 
-func (entity *Entity) GetRepositoryToken() tokens.RepositoryToken {
+func (entity *Entity) GetRepositoryToken() string {
 	return "entity"
 }
 
@@ -94,7 +94,7 @@ func (*Model) NewEntity() interface{} {
 	return new(Entity)
 }
 
-func (model *Model) ToDocument(entity interface{}) models.DocumentInterface {
+func (model *Model) ToDocument(entity interface{}) types.DocumentInterface {
 	return &ModelDocument{
 		Entity: entity.(*Entity),
 	}

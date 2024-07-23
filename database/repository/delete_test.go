@@ -3,18 +3,17 @@ package repository
 import (
 	"context"
 	"fmt"
+	"testing"
+
 	"github.com/fanky5g/ponzu-driver-postgres/connection"
-	ponzuConstants "github.com/fanky5g/ponzu/constants"
-	ponzuDriver "github.com/fanky5g/ponzu/driver"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"testing"
 )
 
 type DeleteTestSuite struct {
 	suite.Suite
-	repo ponzuDriver.Repository
+	repo *Repository
 	conn *pgxpool.Pool
 }
 
@@ -96,7 +95,7 @@ func (s *DeleteTestSuite) TestDeleteByFieldEqual() {
 		s.T().Fatalf("Expected item to be inserted correctly but was nil")
 	}
 
-	err = s.repo.DeleteBy("email", ponzuConstants.Equal, entity.Email)
+	err = s.repo.DeleteBy("email", "=", entity.Email)
 	if err != nil {
 		s.T().Fatalf("Expected err to be nil. Got: %v", err)
 	}
@@ -115,7 +114,7 @@ func (s *DeleteTestSuite) TestDeleteByFieldLessThan() {
 		}
 	}
 
-	err := s.repo.DeleteBy("age", ponzuConstants.LessThan, 20)
+	err := s.repo.DeleteBy("age", "<", 20)
 	if err != nil {
 		s.T().Fatalf("Expected err to be nil. Got: %v", err)
 	}
@@ -134,7 +133,7 @@ func (s *DeleteTestSuite) TestDeleteByFieldGreaterThan() {
 		}
 	}
 
-	err := s.repo.DeleteBy("age", ponzuConstants.GreaterThan, 10)
+	err := s.repo.DeleteBy("age", ">", 10)
 	if err != nil {
 		s.T().Fatalf("Expected err to be nil. Got: %v", err)
 	}
@@ -153,7 +152,7 @@ func (s *DeleteTestSuite) TestDeleteByFieldGreaterThanOrEqualTo() {
 		}
 	}
 
-	err := s.repo.DeleteBy("age", ponzuConstants.GreaterThanOrEqualTo, 10)
+	err := s.repo.DeleteBy("age", ">=", 10)
 	if err != nil {
 		s.T().Fatalf("Expected err to be nil. Got: %v", err)
 	}
@@ -172,7 +171,7 @@ func (s *DeleteTestSuite) TestDeleteByFieldLessThanOrEqualTo() {
 		}
 	}
 
-	err := s.repo.DeleteBy("age", ponzuConstants.LessThanOrEqualTo, 20)
+	err := s.repo.DeleteBy("age", "<=", 20)
 	if err != nil {
 		s.T().Fatalf("Expected err to be nil. Got: %v", err)
 	}

@@ -3,12 +3,11 @@ package repository
 import (
 	"errors"
 	"fmt"
-	"github.com/fanky5g/ponzu/constants"
 	"reflect"
 	"time"
 )
 
-func (repo *repository) valueType(value interface{}) (string, error) {
+func (repo *Repository) valueType(value interface{}) (string, error) {
 	v := reflect.ValueOf(value)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
@@ -40,23 +39,19 @@ func (repo *repository) valueType(value interface{}) (string, error) {
 	}
 }
 
-func (repo *repository) getComparisonOperator(operator constants.ComparisonOperator) (string, error) {
-	var comparisonOperator string
-
+func (repo *Repository) getComparisonOperator(operator string) (string, error) {
 	switch operator {
-	case constants.Equal:
-		comparisonOperator = "="
-	case constants.LessThan:
-		comparisonOperator = "<"
-	case constants.LessThanOrEqualTo:
-		comparisonOperator = "<="
-	case constants.GreaterThan:
-		comparisonOperator = ">"
-	case constants.GreaterThanOrEqualTo:
-		comparisonOperator = ">="
+	case Equal:
+        fallthrough
+	case LessThan:
+        fallthrough
+	case LessThanOrEqualTo:
+        fallthrough
+	case GreaterThan:
+        fallthrough
+	case GreaterThanOrEqualTo:
+        return operator, nil
 	default:
-		return "", errors.New("invalid comparison operator")
+		return "", errors.New("unsupported comparison operator")
 	}
-
-	return comparisonOperator, nil
 }

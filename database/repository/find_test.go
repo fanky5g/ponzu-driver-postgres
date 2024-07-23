@@ -4,9 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/fanky5g/ponzu-driver-postgres/connection"
-	ponzuConstants "github.com/fanky5g/ponzu/constants"
-	ponzuDriver "github.com/fanky5g/ponzu/driver"
-	"github.com/fanky5g/ponzu/entities"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -34,7 +31,7 @@ var testEntities = []*testEntity{
 
 type FindTestSuite struct {
 	suite.Suite
-	repo ponzuDriver.Repository
+	repo *Repository
 	conn *pgxpool.Pool
 }
 
@@ -110,7 +107,7 @@ func (s *FindTestSuite) TestFindDescNoPagination() {
 		<-time.After(time.Microsecond)
 	}
 
-	numItems, matches, err := s.repo.Find(ponzuConstants.Descending, nil)
+	numItems, matches, err := s.repo.Find("DESC", nil)
 	if assert.NoError(s.T(), err) {
 		assert.Equal(s.T(), len(testEntities), numItems)
 		assert.Equal(s.T(), len(matches), 3)
@@ -131,7 +128,7 @@ func (s *FindTestSuite) TestFindAscNoPagination() {
 		<-time.After(time.Microsecond)
 	}
 
-	numItems, matches, err := s.repo.Find(ponzuConstants.Ascending, nil)
+	numItems, matches, err := s.repo.Find("ASC", nil)
 	if assert.NoError(s.T(), err) {
 		assert.Equal(s.T(), len(testEntities), numItems)
 		assert.Equal(s.T(), len(matches), 3)
@@ -152,10 +149,7 @@ func (s *FindTestSuite) TestFindDescPagination() {
 		<-time.After(time.Microsecond)
 	}
 
-	numItems, matches, err := s.repo.Find(ponzuConstants.Descending, &entities.Pagination{
-		Count:  1,
-		Offset: 0,
-	})
+	numItems, matches, err := s.repo.Find("DESC", newPaginator(1, 0))
 
 	if assert.NoError(s.T(), err) {
 		assert.Equal(s.T(), len(testEntities), numItems)
@@ -174,10 +168,7 @@ func (s *FindTestSuite) TestFindAscPagination() {
 		<-time.After(time.Microsecond)
 	}
 
-	numItems, matches, err := s.repo.Find(ponzuConstants.Ascending, &entities.Pagination{
-		Count:  1,
-		Offset: 0,
-	})
+	numItems, matches, err := s.repo.Find("ASC", newPaginator(1, 0))
 
 	if assert.NoError(s.T(), err) {
 		assert.Equal(s.T(), len(testEntities), numItems)
@@ -196,10 +187,7 @@ func (s *FindTestSuite) TestFindAscPaginationWithOffset() {
 		<-time.After(time.Microsecond)
 	}
 
-	numItems, matches, err := s.repo.Find(ponzuConstants.Ascending, &entities.Pagination{
-		Count:  2,
-		Offset: 1,
-	})
+	numItems, matches, err := s.repo.Find("ASC", newPaginator(2, 1))
 
 	if assert.NoError(s.T(), err) {
 		assert.Equal(s.T(), len(testEntities), numItems)

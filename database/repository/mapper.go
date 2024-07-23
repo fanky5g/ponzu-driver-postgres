@@ -3,19 +3,19 @@ package repository
 import (
 	"encoding/json"
 	"fmt"
-	ponzuItem "github.com/fanky5g/ponzu/content/item"
-	"github.com/fanky5g/ponzu/models"
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/fanky5g/ponzu-driver-postgres/types"
+	"github.com/google/uuid"
 )
 
 // MapToEntity maps a domain model to a Database Model
-func (repo *repository) MapToEntity(entity interface{}) *models.Model {
-	model := &models.Model{
+func (repo *Repository) MapToEntity(entity interface{}) *types.Model {
+	model := &types.Model{
 		Document: repo.model.ToDocument(entity),
 	}
 
-	if identifiable, ok := entity.(ponzuItem.Identifiable); ok {
+	if identifiable, ok := entity.(types.Identifiable); ok {
 		if identifiable.ItemID() == "" {
 			identifiable.SetItemID(uuid.New().String())
 		}
@@ -25,7 +25,7 @@ func (repo *repository) MapToEntity(entity interface{}) *models.Model {
 		model.ID = uuid.New()
 	}
 
-	if temporal, ok := entity.(ponzuItem.Temporal); ok {
+	if temporal, ok := entity.(types.Temporal); ok {
 		if temporal.CreatedAt() != 0 {
 			model.CreatedAt = time.Unix(temporal.CreatedAt(), 0)
 		}
@@ -38,7 +38,7 @@ func (repo *repository) MapToEntity(entity interface{}) *models.Model {
 	return model
 }
 
-func (repo *repository) MapFromEntity(model *models.Model) (interface{}, error) {
+func (repo *Repository) MapFromEntity(model *types.Model) (interface{}, error) {
 	entity := repo.model.NewEntity()
 
 	if model.Document != nil {
@@ -52,11 +52,11 @@ func (repo *repository) MapFromEntity(model *models.Model) (interface{}, error) 
 		}
 	}
 
-	if identifiable, ok := entity.(ponzuItem.Identifiable); ok {
+	if identifiable, ok := entity.(types.Identifiable); ok {
 		identifiable.SetItemID(model.ID.String())
 	}
 
-	if temporal, ok := entity.(ponzuItem.Temporal); ok {
+	if temporal, ok := entity.(types.Temporal); ok {
 		temporal.SetCreatedAt(model.CreatedAt)
 		temporal.SetUpdatedAt(model.UpdatedAt)
 	}
