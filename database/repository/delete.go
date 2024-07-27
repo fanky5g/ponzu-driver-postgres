@@ -6,7 +6,7 @@ import (
 	"github.com/fanky5g/ponzu/constants"
 )
 
-func (repo *repository) DeleteById(id string) error {
+func (repo *Repository) DeleteById(id string) error {
 	sqlString := fmt.Sprintf(
 		"UPDATE %s SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1::uuid",
 		repo.model.Name(),
@@ -28,7 +28,7 @@ func (repo *repository) DeleteById(id string) error {
 	return nil
 }
 
-func (repo *repository) DeleteBy(field string, operator constants.ComparisonOperator, value interface{}) error {
+func (repo *Repository) DeleteBy(field string, operator constants.ComparisonOperator, value interface{}) error {
 	valueType, err := repo.valueType(value)
 	if err != nil {
 		return err

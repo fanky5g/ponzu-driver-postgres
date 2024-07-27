@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func (repo *repository) Insert(entity interface{}) (interface{}, error) {
+func (repo *Repository) Insert(entity interface{}) (interface{}, error) {
 	model := repo.MapToEntity(entity)
 	sqlString := fmt.Sprintf(`
 INSERT INTO %s (id, created_at, updated_at, document) VALUES($1::uuid, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $2::jsonb)

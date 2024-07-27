@@ -2,42 +2,63 @@ package search
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/fanky5g/ponzu-driver-postgres/connection"
 	"github.com/fanky5g/ponzu-driver-postgres/database/repository"
-	ponzuDriver "github.com/fanky5g/ponzu/driver"
-	"github.com/fanky5g/ponzu/models"
+	"github.com/fanky5g/ponzu/entities"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"strings"
 )
 
-type searchClient struct {
-	searchableFields []string
-	tableName        string
+var (
+	ErrInvalidSearchEntity = errors.New("invalid search entity")
+)
 
-	conn *pgxpool.Pool
-	repo repository.RowScanner
-}
-
-func (s *searchClient) Search(query string, limit, offset int) ([]interface{}, error) {
-	results, _, err := s.SearchWithPagination(query, limit, offset)
+func (c *Client) Search(entity interface{}, query string, limit, offset int) ([]interface{}, error) {
+	results, _, err := c.SearchWithPagination(entity, query, limit, offset)
 	return results, err
 }
 
-func (s *searchClient) SearchWithPagination(query string, limit, offset int) ([]interface{}, int, error) {
+func (c *Client) SearchWithPagination(entity interface{}, query string, limit, offset int) ([]interface{}, int, error) {
+	persistable, ok := entity.(entities.Persistable)
+	if !ok {
+		return nil, 0, ErrInvalidSearchEntity
+	}
+
+	searchableFields, err := getSearchableFields(entity)
+	if err != nil {
+		return nil, 0, err
+	}
+
 	ctx := context.Background()
-	conn, err := s.conn.Acquire(ctx)
+	pool, err := connection.Get(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	conn, err := pool.Acquire(ctx)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	defer conn.Release()
+	databaseRepository := c.db.GetRepositoryByToken(persistable.GetRepositoryToken())
+	if databaseRepository == nil {
+		return nil, 0, ErrInvalidSearchEntity
+	}
 
-	queryLength := len(s.searchableFields)
+	repo, ok := databaseRepository.(*repository.Repository)
+	if !ok {
+		return nil, 0, ErrInvalidSearchEntity
+	}
+
+	queryLength := len(searchableFields)
 	whereClauses := make([]string, queryLength)
 	values := make([]interface{}, queryLength)
 	position := 0
-	for _, field := range s.searchableFields {
+	for _, field := range searchableFields {
 		whereClauses[position] = fmt.Sprintf(
 			"(document->>'%s') LIKE $1",
 			field,
@@ -60,7 +81,7 @@ func (s *searchClient) SearchWithPagination(query string, limit, offset int) ([]
 			WHERE (%s) AND deleted_at IS NULL
 			ORDER BY updated_at DESC
 			LIMIT %d
-	`, s.tableName, whereClause, size)
+	`, repo.TableName(), whereClause, size)
 
 	if offset > 0 {
 		sqlString = fmt.Sprintf(`
@@ -70,7 +91,7 @@ func (s *searchClient) SearchWithPagination(query string, limit, offset int) ([]
 	}
 
 	value := fmt.Sprintf("%%%s%%", query)
-	count, err := s.count(ctx, conn, whereClause, value)
+	count, err := c.count(ctx, conn, repo.TableName(), whereClause, value)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -84,7 +105,7 @@ func (s *searchClient) SearchWithPagination(query string, limit, offset int) ([]
 	results := make([]interface{}, 0)
 	for rows.Next() {
 		var result interface{}
-		if result, err = s.repo.ScanRow(rows); err != nil {
+		if result, err = repo.ScanRow(rows); err != nil {
 			return nil, 0, err
 		}
 
@@ -98,12 +119,12 @@ func (s *searchClient) SearchWithPagination(query string, limit, offset int) ([]
 	return results, count, nil
 }
 
-func (s *searchClient) count(ctx context.Context, conn *pgxpool.Conn, whereClause, value string) (int, error) {
+func (c *Client) count(ctx context.Context, conn *pgxpool.Conn, tableName, whereClause, value string) (int, error) {
 	sqlString := fmt.Sprintf(`
 		SELECT COUNT(*)
 		FROM %s
 		WHERE (%s) AND deleted_at IS NULL
-`, s.tableName, whereClause)
+`, tableName, whereClause)
 
 	count := 0
 	err := conn.QueryRow(ctx, sqlString, value).Scan(&count)
@@ -115,41 +136,11 @@ func (s *searchClient) count(ctx context.Context, conn *pgxpool.Conn, whereClaus
 }
 
 // Update is a no-op as with postgres we don't have to actually update any index
-func (s *searchClient) Update(id string, data interface{}) error {
+func (c *Client) Update(id string, data interface{}) error {
 	return nil
 }
 
 // Delete is a no-op as with postgres we don't have to delete from an index.
-//
-//	Deletion from database from repository should be sufficient
-func (s *searchClient) Delete(id string) error {
+func (c *Client) Delete(entityName, id string) error {
 	return nil
-}
-
-func NewEntitySearch(model models.ModelInterface) (ponzuDriver.SearchInterface, error) {
-	conn, err := connection.Get(context.Background())
-	if err != nil {
-		return nil, err
-	}
-
-	return NewEntitySearchWithConn(conn, model)
-}
-
-func NewEntitySearchWithConn(conn *pgxpool.Pool, model models.ModelInterface) (ponzuDriver.SearchInterface, error) {
-	repo, err := repository.New(conn, model)
-	if err != nil {
-		return nil, err
-	}
-
-	searchableFields, err := getSearchableFields(model.NewEntity())
-	if err != nil {
-		return nil, err
-	}
-
-	return &searchClient{
-		searchableFields: searchableFields,
-		conn:             conn,
-		repo:             repo,
-		tableName:        model.Name(),
-	}, nil
 }

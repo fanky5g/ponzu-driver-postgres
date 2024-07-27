@@ -10,7 +10,7 @@ import (
 )
 
 // MapToEntity maps a domain model to a Database Model
-func (repo *repository) MapToEntity(entity interface{}) *models.Model {
+func (repo *Repository) MapToEntity(entity interface{}) *models.Model {
 	model := &models.Model{
 		Document: repo.model.ToDocument(entity),
 	}
@@ -38,7 +38,7 @@ func (repo *repository) MapToEntity(entity interface{}) *models.Model {
 	return model
 }
 
-func (repo *repository) MapFromEntity(model *models.Model) (interface{}, error) {
+func (repo *Repository) MapFromEntity(model *models.Model) (interface{}, error) {
 	entity := repo.model.NewEntity()
 
 	if model.Document != nil {

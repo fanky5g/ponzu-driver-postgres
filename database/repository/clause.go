@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func (repo *repository) valueType(value interface{}) (string, error) {
+func (repo *Repository) valueType(value interface{}) (string, error) {
 	v := reflect.ValueOf(value)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
@@ -40,7 +40,7 @@ func (repo *repository) valueType(value interface{}) (string, error) {
 	}
 }
 
-func (repo *repository) getComparisonOperator(operator constants.ComparisonOperator) (string, error) {
+func (repo *Repository) getComparisonOperator(operator constants.ComparisonOperator) (string, error) {
 	var comparisonOperator string
 
 	switch operator {

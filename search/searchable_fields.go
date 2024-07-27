@@ -2,13 +2,26 @@ package search
 
 import (
 	"fmt"
+	"reflect"
+
+	"github.com/fanky5g/ponzu/content"
 	"github.com/fanky5g/ponzu/entities"
 	"github.com/fanky5g/ponzu/util"
-	"reflect"
 )
+
+var searchableFieldsStore = make(map[string][]string)
 
 // getSearchableFields returns fields that are supported for search
 func getSearchableFields(entity interface{}) ([]string, error) {
+	entityInterface, ok := entity.(content.Entity)
+	if !ok {
+		return nil, ErrInvalidSearchEntity
+	}
+
+	if searchableFields, ok := searchableFieldsStore[entityInterface.EntityName()]; ok {
+		return searchableFields, nil
+	}
+
 	v := reflect.Indirect(reflect.ValueOf(entity))
 	t := v.Type()
 
@@ -31,6 +44,8 @@ func getSearchableFields(entity interface{}) ([]string, error) {
 
 			searchableFields = append(searchableFields, attribute)
 		}
+
+		searchableFieldsStore[entityInterface.EntityName()] = searchableFields
 		return searchableFields, nil
 	}
 
@@ -51,5 +66,6 @@ func getSearchableFields(entity interface{}) ([]string, error) {
 		}
 	}
 
+	searchableFieldsStore[entityInterface.EntityName()] = searchableFields
 	return searchableFields, nil
 }

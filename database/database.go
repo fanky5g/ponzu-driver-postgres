@@ -12,12 +12,12 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type driver struct {
+type Database struct {
 	conn         *pgxpool.Pool
 	repositories map[tokens.RepositoryToken]ponzuDriver.Repository
 }
 
-func (database *driver) GetRepositoryByToken(token tokens.RepositoryToken) ponzuDriver.Repository {
+func (database *Database) GetRepositoryByToken(token tokens.RepositoryToken) ponzuDriver.Repository {
 	if repo, ok := database.repositories[token]; ok {
 		return repo
 	}
@@ -25,12 +25,12 @@ func (database *driver) GetRepositoryByToken(token tokens.RepositoryToken) ponzu
 	return nil
 }
 
-func (database *driver) Close() error {
+func (database *Database) Close() error {
 	database.conn.Close()
 	return nil
 }
 
-func New(models []models.ModelInterface) (ponzuDriver.Database, error) {
+func New(models []models.ModelInterface) (*Database, error) {
 	ctx := context.Background()
 	conn, err := connection.Get(ctx)
 
@@ -55,7 +55,7 @@ func New(models []models.ModelInterface) (ponzuDriver.Database, error) {
 		repos[persistable.GetRepositoryToken()] = repo
 	}
 
-	d := &driver{conn: conn, repositories: repos}
+	d := &Database{conn: conn, repositories: repos}
 
 	return d, nil
 }

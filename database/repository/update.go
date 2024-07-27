@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func (repo *repository) UpdateById(id string, update interface{}) (interface{}, error) {
+func (repo *Repository) UpdateById(id string, update interface{}) (interface{}, error) {
 	document := repo.model.ToDocument(update)
 	sqlString := fmt.Sprintf(
 		"UPDATE %s SET document = $1::jsonb, updated_at = CURRENT_TIMESTAMP WHERE id = $2::uuid",

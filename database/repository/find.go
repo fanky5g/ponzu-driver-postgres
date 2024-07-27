@@ -11,7 +11,7 @@ import (
 
 var DefaultQuerySize = 100
 
-func (repo *repository) FindOneById(id string) (interface{}, error) {
+func (repo *Repository) FindOneById(id string) (interface{}, error) {
 	ctx := context.Background()
 	conn, err := repo.conn.Acquire(ctx)
 	if err != nil {
@@ -22,7 +22,7 @@ func (repo *repository) FindOneById(id string) (interface{}, error) {
 	return repo.findOneByIdWithConn(id, conn)
 }
 
-func (repo *repository) Latest() (interface{}, error) {
+func (repo *Repository) Latest() (interface{}, error) {
 	sqlString := fmt.Sprintf(`
 		SELECT id, created_at, updated_at, document
 		FROM %s
@@ -45,7 +45,7 @@ func (repo *repository) Latest() (interface{}, error) {
 	))
 }
 
-func (repo *repository) FindOneBy(criteria map[string]interface{}) (interface{}, error) {
+func (repo *Repository) FindOneBy(criteria map[string]interface{}) (interface{}, error) {
 	queryLength := len(criteria)
 	whereClauses := make([]string, queryLength)
 	values := make([]interface{}, queryLength)
@@ -88,7 +88,7 @@ func (repo *repository) FindOneBy(criteria map[string]interface{}) (interface{},
 	))
 }
 
-func (repo *repository) count(ctx context.Context, conn *pgxpool.Conn) (int, error) {
+func (repo *Repository) count(ctx context.Context, conn *pgxpool.Conn) (int, error) {
 	sqlString := fmt.Sprintf(`
 		SELECT COUNT(*)
 		FROM %s
@@ -104,7 +104,7 @@ func (repo *repository) count(ctx context.Context, conn *pgxpool.Conn) (int, err
 	return count, nil
 }
 
-func (repo *repository) Find(order ponzuConstants.SortOrder, pagination *entities.Pagination) (int, []interface{}, error) {
+func (repo *Repository) Find(order ponzuConstants.SortOrder, pagination *entities.Pagination) (int, []interface{}, error) {
 	ctx := context.Background()
 	conn, err := repo.conn.Acquire(ctx)
 	if err != nil {
@@ -170,7 +170,7 @@ func (repo *repository) Find(order ponzuConstants.SortOrder, pagination *entitie
 	return count, results, nil
 }
 
-func (repo *repository) FindAll() ([]interface{}, error) {
+func (repo *Repository) FindAll() ([]interface{}, error) {
 	var allResults []interface{}
 	numResults, results, err := repo.Find(ponzuConstants.Descending, nil)
 	if err != nil {
@@ -197,7 +197,7 @@ func (repo *repository) FindAll() ([]interface{}, error) {
 	return allResults, nil
 }
 
-func (repo *repository) findOneByIdWithConn(id string, conn *pgxpool.Conn) (interface{}, error) {
+func (repo *Repository) findOneByIdWithConn(id string, conn *pgxpool.Conn) (interface{}, error) {
 	sqlString := fmt.Sprintf(
 		"SELECT id, created_at, updated_at, document FROM %s WHERE id = $1::uuid AND deleted_at IS NULL",
 		repo.model.Name(),
