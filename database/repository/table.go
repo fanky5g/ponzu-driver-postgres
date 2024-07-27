@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func (repo *repository) AutoMigrate(ctx context.Context) error {
+func (repo *Repository) AutoMigrate(ctx context.Context) error {
 	sqlString := fmt.Sprintf(`
 CREATE TABLE IF NOT EXISTS %s (
 	id UUID PRIMARY KEY,

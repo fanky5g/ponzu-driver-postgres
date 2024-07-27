@@ -2,22 +2,23 @@ package search
 
 import (
 	"context"
+	"os"
+	"testing"
+
 	"github.com/fanky5g/ponzu-driver-postgres/connection"
+	"github.com/fanky5g/ponzu-driver-postgres/database"
 	"github.com/fanky5g/ponzu-driver-postgres/database/repository"
 	"github.com/fanky5g/ponzu-driver-postgres/test"
-	ponzuDriver "github.com/fanky5g/ponzu/driver"
+	"github.com/fanky5g/ponzu/models"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"os"
-	"testing"
 )
 
 type SearchTestSuite struct {
 	suite.Suite
 
-	client ponzuDriver.SearchInterface
-	repo   ponzuDriver.Repository
+	client *Client
 	conn   *pgxpool.Pool
 }
 
@@ -37,30 +38,35 @@ var testData = []test.Entity{
 func (s *SearchTestSuite) SetupSuite() {
 	var err error
 	model := new(test.Model)
+	db, err := database.New([]models.ModelInterface{model})
+	if err != nil {
+		s.T().Fatal(err)
+	}
+
+	s.client, err = New(db)
+	if err != nil {
+		s.T().Fatal(err)
+	}
 
 	s.conn, err = connection.Get(context.Background())
 	if err != nil {
 		s.T().Fatal(err)
 	}
 
-	s.repo, err = repository.New(s.conn, model)
+	var repo *repository.Repository
+	repo, err = repository.New(s.conn, model)
 	if err != nil {
 		s.T().Fatal(err)
 	}
 
 	for i := range testData {
 		var insert interface{}
-		insert, err = s.repo.Insert(&testData[i])
+		insert, err = repo.Insert(&testData[i])
 		if err != nil {
 			s.T().Fatal(err)
 		}
 
 		testData[i] = *(insert.(*test.Entity))
-	}
-
-	s.client, err = NewEntitySearchWithConn(s.conn, model)
-	if err != nil {
-		s.T().Fatal(err)
 	}
 }
 
@@ -73,7 +79,7 @@ func (s *SearchTestSuite) TearDownSuite() {
 }
 
 func (s *SearchTestSuite) TestSearch() {
-	matches, count, err := s.client.SearchWithPagination("Al", 0, 0)
+	matches, count, err := s.client.SearchWithPagination(new(test.Entity), "Al", 0, 0)
 	if assert.NoError(s.T(), err) {
 		assert.Equal(s.T(), count, 7)
 		assert.Len(s.T(), matches, 7)
@@ -81,7 +87,7 @@ func (s *SearchTestSuite) TestSearch() {
 }
 
 func (s *SearchTestSuite) TestSearchWithLimit() {
-	matches, count, err := s.client.SearchWithPagination("Al", 5, 0)
+	matches, count, err := s.client.SearchWithPagination(new(test.Entity), "Al", 5, 0)
 	if assert.NoError(s.T(), err) {
 		assert.Equal(s.T(), 7, count)
 		assert.Len(s.T(), matches, 5)
@@ -89,7 +95,7 @@ func (s *SearchTestSuite) TestSearchWithLimit() {
 }
 
 func (s *SearchTestSuite) TestSearchWithOffset() {
-	matches, count, err := s.client.SearchWithPagination("Al", 0, 5)
+	matches, count, err := s.client.SearchWithPagination(new(test.Entity), "Al", 0, 5)
 	if assert.NoError(s.T(), err) {
 		assert.Equal(s.T(), 7, count)
 		assert.Len(s.T(), matches, 2)
