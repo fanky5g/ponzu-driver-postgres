@@ -60,7 +60,7 @@ func (c *Client) SearchWithPagination(entity interface{}, query string, limit, o
 	position := 0
 	for _, field := range searchableFields {
 		whereClauses[position] = fmt.Sprintf(
-			"(document->>'%s') LIKE $1",
+			"(document->>'%s') ILIKE $1",
 			field,
 		)
 
