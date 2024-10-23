@@ -13,7 +13,7 @@ func (repo *Repository) DeleteById(id string) error {
 	)
 
 	ctx := context.Background()
-	conn, err := repo.conn.Acquire(ctx)
+	conn, err := repo.pool.Acquire(ctx)
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func (repo *Repository) DeleteBy(field string, operator constants.ComparisonOper
 	)
 
 	ctx := context.Background()
-	conn, err := repo.conn.Acquire(ctx)
+	conn, err := repo.pool.Acquire(ctx)
 	if err != nil {
 		return err
 	}

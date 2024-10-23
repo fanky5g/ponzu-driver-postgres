@@ -13,7 +13,7 @@ var DefaultQuerySize = 100
 
 func (repo *Repository) FindOneById(id string) (interface{}, error) {
 	ctx := context.Background()
-	conn, err := repo.conn.Acquire(ctx)
+	conn, err := repo.pool.Acquire(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (repo *Repository) Latest() (interface{}, error) {
 `, repo.model.Name())
 
 	ctx := context.Background()
-	conn, err := repo.conn.Acquire(ctx)
+	conn, err := repo.pool.Acquire(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (repo *Repository) FindOneBy(criteria map[string]interface{}) (interface{},
 	)
 
 	ctx := context.Background()
-	conn, err := repo.conn.Acquire(ctx)
+	conn, err := repo.pool.Acquire(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (repo *Repository) count(ctx context.Context, conn *pgxpool.Conn) (int, err
 
 func (repo *Repository) Find(order ponzuConstants.SortOrder, pagination *entities.Pagination) (int, []interface{}, error) {
 	ctx := context.Background()
-	conn, err := repo.conn.Acquire(ctx)
+	conn, err := repo.pool.Acquire(ctx)
 	if err != nil {
 		return 0, nil, err
 	}
