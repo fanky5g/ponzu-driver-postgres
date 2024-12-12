@@ -38,7 +38,6 @@ func New(pool *pgxpool.Pool) (Migrator, error) {
 }
 
 func createMigrationTable(pool *pgxpool.Pool) error {
-	fmt.Println("create migration table called")
 	ctx := context.Background()
 	conn, err := pool.Acquire(ctx)
 	if err != nil {

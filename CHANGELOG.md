@@ -7,5 +7,6 @@ v1.0.0
 v1.1.0
 - Add `ILIKE` operator for case-insensitive search
 
-v1.1.1
+v1.2.0
 - Detach ponzu item type. Use local interfaces 
+- Begin a migration strategy
