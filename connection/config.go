@@ -16,7 +16,7 @@ type Config struct {
 	Port     int
 }
 
-func defineFlags(flagSet *flag.FlagSet, workingDir string) {
+func defineFlags(flagSet *flag.FlagSet) {
 	flagSet.String("database_host", "localhost", "Database host.")
 	flagSet.String("database_user", "postgres", "Database user")
 	flagSet.String("database_password", "", "Database password")
@@ -31,7 +31,7 @@ func getConfig() (*Config, error) {
 	}
 
 	flags := flag.NewFlagSet("config", flag.ExitOnError)
-	defineFlags(flags, cwd)
+	defineFlags(flags)
 
 	if err = flags.Parse(os.Args[1:]); err != nil {
 		return nil, err

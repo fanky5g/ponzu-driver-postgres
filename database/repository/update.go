@@ -13,7 +13,7 @@ func (repo *Repository) UpdateById(id string, update interface{}) (interface{}, 
 	)
 
 	ctx := context.Background()
-	conn, err := repo.conn.Acquire(ctx)
+	conn, err := repo.pool.Acquire(ctx)
 	if err != nil {
 		return nil, err
 	}

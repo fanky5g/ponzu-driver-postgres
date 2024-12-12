@@ -12,7 +12,7 @@ INSERT INTO %s (id, created_at, updated_at, document) VALUES($1::uuid, CURRENT_T
 `, repo.model.Name())
 
 	ctx := context.Background()
-	conn, err := repo.conn.Acquire(ctx)
+	conn, err := repo.pool.Acquire(ctx)
 	if err != nil {
 		return nil, err
 	}
