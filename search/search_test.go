@@ -23,16 +23,16 @@ type SearchTestSuite struct {
 }
 
 var testData = []test.Entity{
-	{Name: "Alice Smith", Email: "alice.johnson@example.com", Age: 34},
+	{Name: "Alice Smith", Email: "alice.smith@example.com", Age: 34},
 	{Name: "Alicia Johnson", Email: "alicia.johnson@example.com", Age: 28},
-	{Name: "Alison Brown", Email: "alison.johnson@example.com", Age: 42},
-	{Name: "Eve Wilson", Email: "albert.johnson@example.com", Age: 36},
+	{Name: "Alison Brown", Email: "alison.brown@example.com", Age: 42},
+	{Name: "Eve Wilson", Email: "eve.wilson@example.com", Age: 36},
 	{Name: "Alfred Johnson", Email: "alfred.johnson@example.com", Age: 45},
-	{Name: "Frank Johnson", Email: "alex.johnson@example.com", Age: 31},
-	{Name: "David Miller", Email: "alexis.johnson@example.com", Age: 29},
+	{Name: "Frank Johnson", Email: "frank.johnson@example.com", Age: 31},
+	{Name: "David Miller", Email: "david.miller@example.com", Age: 29},
 	{Name: "Alexander Johnson", Email: "alexander.johnson@example.com", Age: 40},
 	{Name: "Alexa Taylor", Email: "alexa.johnson@example.com", Age: 27},
-	{Name: "Alexandra Miller", Email: "alexandra.johnson@example.com", Age: 33},
+	{Name: "Alexandra Miller", Email: "alexandra.miller@example.com", Age: 33},
 }
 
 func (s *SearchTestSuite) SetupSuite() {
